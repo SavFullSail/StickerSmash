@@ -1,37 +1,32 @@
-const { withDangerousMod } = require('@expo/config-plugins');
-const fs = require('fs');
-const path = require('path');
+const { withXcodeProject } = require('@expo/config-plugins');
 
-const MIN_DEPLOYMENT_TARGET = '26.0';
+const APP_DEPLOYMENT_TARGET = '26.0';
+
+function setAppDeploymentTarget(project, deploymentTarget) {
+  const { Target } = require('@expo/config-plugins').IOSConfig;
+  const { getBuildConfigurationsForListId } = require('@expo/config-plugins').IOSConfig.XcodeUtils;
+
+  const targetBuildConfigListIds = Target.getNativeTargets(project)
+    .filter(([, target]) => Target.isTargetOfType(target, Target.TargetType.APPLICATION))
+    .map(([, target]) => target.buildConfigurationList);
+
+  for (const buildConfigListId of targetBuildConfigListIds) {
+    for (const [, configurations] of getBuildConfigurationsForListId(project, buildConfigListId)) {
+      const { buildSettings } = configurations;
+      if (buildSettings?.IPHONEOS_DEPLOYMENT_TARGET) {
+        buildSettings.IPHONEOS_DEPLOYMENT_TARGET = deploymentTarget;
+      }
+    }
+  }
+
+  return project;
+}
 
 function withIosDeploymentTargetFix(config) {
-  return withDangerousMod(config, [
-    'ios',
-    async (config) => {
-      const podfilePath = path.join(config.modRequest.platformProjectRoot, 'Podfile');
-      let contents = fs.readFileSync(podfilePath, 'utf-8');
-
-      const patch = `    # @generated withIosDeploymentTargetFix
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |build_config|
-        if Gem::Version.new(build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] || '0') < Gem::Version.new('${MIN_DEPLOYMENT_TARGET}')
-          build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${MIN_DEPLOYMENT_TARGET}'
-        end
-      end
-    end
-`;
-
-      if (!contents.includes('@generated withIosDeploymentTargetFix')) {
-        contents = contents.replace(
-          /post_install do \|installer\|/,
-          `post_install do |installer|\n${patch}`
-        );
-        fs.writeFileSync(podfilePath, contents);
-      }
-
-      return config;
-    },
-  ]);
+  return withXcodeProject(config, (config) => {
+    config.modResults = setAppDeploymentTarget(config.modResults, APP_DEPLOYMENT_TARGET);
+    return config;
+  });
 }
 
 module.exports = withIosDeploymentTargetFix;
