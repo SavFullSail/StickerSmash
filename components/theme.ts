@@ -33,6 +33,7 @@ export const spacing = {
 } as const;
 
 export const typeScale = {
+  display: { size: 56, weight: 'bold', design: 'rounded' } as const,
   largeTitle: { size: 34, weight: 'bold', design: 'rounded' } as const,
   title2: { size: 22, weight: 'semibold', design: 'rounded' } as const,
   headline: { size: 17, weight: 'semibold' } as const,
