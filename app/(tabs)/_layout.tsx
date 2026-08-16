@@ -1,9 +1,10 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useColorScheme } from 'react-native';
+import { DynamicColorIOS, Platform, useColorScheme } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const tintColor = colorScheme === 'dark' ? '#FFFFFF' : '#1C1C1E';
+  const fallback = colorScheme === 'dark' ? '#FFFFFF' : '#1C1C1E';
+  const tintColor = Platform.OS === 'ios' ? DynamicColorIOS({ light: '#1C1C1E', dark: '#FFFFFF' }) : fallback;
 
   return (
     <NativeTabs
