@@ -55,6 +55,7 @@ jobs:
 
       - name: 🔨 Compile Unsigned ARM64 Device Binary
         run: |
+          set -o pipefail
           xcodebuild build \
             -workspace ios/StickerSmash.xcworkspace \
             -scheme StickerSmash \
@@ -67,15 +68,27 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             SWIFT_COMPILATION_MODE=singlefile \
-            | xcbeautify --renderer github-actions || true
+            | xcbeautify --renderer github-actions
 
       - name: ✅ Verify Build Output
         run: |
-          APP_PATH="build/Build/Products/Release-iphoneos"
-          if ! ls "$APP_PATH"/*.app >/dev/null 2>&1; then
-            echo "::error::No .app bundle found in $APP_PATH"
+          APP_PATH=$(ls -d build/Build/Products/Release-iphoneos/*.app 2>/dev/null | head -n1)
+          if [ -z "$APP_PATH" ]; then
+            echo "::error::No .app bundle found"
             exit 1
           fi
+          if [ ! -f "$APP_PATH/Info.plist" ]; then
+            echo "::error::Info.plist missing from $APP_PATH — build likely failed silently"
+            ls -la "$APP_PATH"
+            exit 1
+          fi
+          EXEC_NAME=$(basename "$APP_PATH" .app)
+          if [ ! -f "$APP_PATH/$EXEC_NAME" ]; then
+            echo "::error::Executable $EXEC_NAME missing from $APP_PATH"
+            ls -la "$APP_PATH"
+            exit 1
+          fi
+          echo "✅ App bundle verified: $APP_PATH"
 
       - name: 📦 Fast-Pack Sideloadable IPA
         run: |
