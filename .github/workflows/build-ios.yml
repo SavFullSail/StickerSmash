@@ -1,7 +1,7 @@
 name: Build Unsigned iOS IPA
 
 on:
-  workflow_dispatch: # Allows manual trigger from the GitHub web UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,16 +13,15 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
 
       - name: 📦 Install Node Dependencies
-        run: npm ci
+        run: npm install
 
       - name: ⚙️ Generate Native iOS Project
         run: npx expo prebuild --platform ios --clean
 
-      - name: 🛠️ Install CocoaPodsS
+      - name: 🛠️ Install CocoaPods
         run: |
           cd ios
           pod install
@@ -44,9 +43,7 @@ jobs:
       - name: 📦 Package into Sideloadable IPA
         run: |
           mkdir -p Payload
-          # Copy the compiled .app bundle into the Payload folder
           cp -r build/Build/Products/Release-iphoneos/*.app Payload/
-          # Zip into .ipa structure
           zip -r StickerSmash.ipa Payload
           rm -rf Payload
 
