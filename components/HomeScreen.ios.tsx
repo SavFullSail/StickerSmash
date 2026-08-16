@@ -44,10 +44,7 @@ export default function HomeScreen() {
                 <SectionHeader title="Typography" icon="textformat" />
                 <GlassCard gap={10}>
                   <Text
-                    modifiers={[
-                      font({ size: 22, weight: 'semibold', design: 'rounded' }),
-                      foregroundStyle('#FFFFFF'),
-                    ]}>
+                    modifiers={[font(typeScale.title2), foregroundStyle('#FFFFFF')]}>
                     Title 2 — section headers
                   </Text>
                   <Text modifiers={[font(typeScale.body), foregroundStyle('#FFFFFF')]}>
