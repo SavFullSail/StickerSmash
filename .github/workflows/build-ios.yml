@@ -22,7 +22,7 @@ jobs:
       - name: ⚙️ Generate Native iOS Project
         run: npx expo prebuild --platform ios --clean
 
-      - name: 🛠️ Install CocoaPods
+      - name: 🛠️ Install CocoaPodsS
         run: |
           cd ios
           pod install
