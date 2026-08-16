@@ -1,5 +1,5 @@
-import LiquidGlassHome from '@/components/LiquidGlassHome';
+import HomeScreen from '@/components/HomeScreen';
 
 export default function Index() {
-  return <LiquidGlassHome />;
+  return <HomeScreen />;
 }
