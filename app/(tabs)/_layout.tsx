@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -8,14 +9,21 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#ffd33d',
-        headerStyle: {
-        backgroundColor: '#25292e',
-        },
         headerShadowVisible: false,
         headerTintColor: '#fff',
-        tabBarStyle: {
-        backgroundColor: '#25292e',
+        headerTransparent: true,
+        headerStyle: {
+        backgroundColor: 'transparent',
         },
+        tabBarStyle: {
+        backgroundColor: 'transparent',
+        position: 'absolute',
+        borderTopWidth: 0,
+        elevation: 0,
+        },
+        tabBarBackground: () => (
+          <BlurView experimentalBlurMethod="dimezisBlurView" intensity={80} tint="systemMaterialDark" style={{ flex: 1 }} />
+        ),
         }}
     >
       <Tabs.Screen

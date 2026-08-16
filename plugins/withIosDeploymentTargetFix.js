@@ -2,7 +2,7 @@ const { withDangerousMod } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
 
-const MIN_DEPLOYMENT_TARGET = '15.1';
+const MIN_DEPLOYMENT_TARGET = '26.0';
 
 function withIosDeploymentTargetFix(config) {
   return withDangerousMod(config, [
