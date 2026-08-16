@@ -5,10 +5,13 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
+
+      - name: 🛠️ Select Xcode 16.2
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -18,13 +21,8 @@ jobs:
       - name: 📦 Install Node Dependencies
         run: npm install
 
-      - name: ⚙️ Generate Native iOS Project
+      - name: ⚙️ Generate Native iOS Project & Install Pods
         run: npx expo prebuild --platform ios --clean
-
-      - name: 🛠️ Install CocoaPods
-        run: |
-          cd ios
-          pod install
 
       - name: 🔨 Compile Unsigned ARM64 Device Binary
         run: |
