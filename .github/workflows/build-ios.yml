@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: xcode-27
+    runs-on: xcode-26
     timeout-minutes: 45
     steps:
       - name: ⬇️ Checkout Repository
