@@ -1,5 +1,5 @@
-import LiquidGlassAbout from '@/components/LiquidGlassAbout';
+import AboutScreen from '@/components/AboutScreen';
 
-export default function AboutScreen() {
-  return <LiquidGlassAbout />;
+export default function AboutScreenRoute() {
+  return <AboutScreen />;
 }
