@@ -14,9 +14,9 @@ jobs:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🛠️ Select Xcode 16.2 & Initialize CoreSimulator
+      - name: 🛠️ Select Xcode 16.1 & Initialize CoreSimulator
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.2.app
+          sudo xcode-select -s /Applications/Xcode_16.1.app
           xcrun simctl list devices > /dev/null 2>&1 || true
 
       - name: 🟢 Setup Node.js
@@ -32,16 +32,14 @@ jobs:
           rm -rf ios
           npx expo prebuild --platform ios --clean
 
-      - name: 🔨 Compile & Archive Unsigned Device Binary
+      - name: 🔨 Compile Unsigned ARM64 Device Binary
         run: |
-          xcodebuild archive \
+          xcodebuild build \
             -workspace ios/StickerSmash.xcworkspace \
             -scheme StickerSmash \
-            -sdk iphoneos \
             -configuration Release \
-            -archivePath build/StickerSmash.xcarchive \
-            -parallelizeTargets \
-            -jobs $(sysctl -n hw.ncpu) \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -54,7 +52,7 @@ jobs:
       - name: 📦 Fast-Pack Sideloadable IPA
         run: |
           mkdir -p Payload
-          cp -r build/StickerSmash.xcarchive/Products/Applications/*.app Payload/
+          cp -r build/Build/Products/Release-iphoneos/*.app Payload/
           zip -rq -1 StickerSmash.ipa Payload
           rm -rf Payload
 
