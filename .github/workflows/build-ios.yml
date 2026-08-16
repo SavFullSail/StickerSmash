@@ -1,4 +1,4 @@
-name: Build Unsigned iOS IPA (iOS 27 Beta)
+name: Build Unsigned iOS IPA (iOS 26 SDK)
 on:
   workflow_dispatch:
 
@@ -50,14 +50,21 @@ jobs:
           rm -rf ios
           bunx expo prebuild --platform ios --clean
 
-      - name: 🔨 Compile Unsigned ARM64 Device Binary (iOS 27 SDK)
+      - name: 🔨 Compile Unsigned ARM64 Device Binary (iOS 26 SDK)
         run: |
           set -o pipefail
+          IOS26_SDK=$(xcodebuild -showsdks | awk '/iphoneos26\./ {print $NF; exit}')
+          if [ -z "$IOS26_SDK" ]; then
+            echo "::error::No iOS 26 SDK found. Installed SDKs:"
+            xcodebuild -showsdks
+            exit 1
+          fi
+          echo "Using SDK: $IOS26_SDK"
           xcodebuild build \
             -workspace ios/StickerSmash.xcworkspace \
             -scheme StickerSmash \
             -configuration Release \
-            -sdk iphoneos \
+            -sdk "$IOS26_SDK" \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
@@ -97,6 +104,6 @@ jobs:
       - name: ⬆️ Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StickerSmash-Device-IPA-iOS27
+          name: StickerSmash-Device-IPA-iOS26
           path: StickerSmash.ipa
           retention-days: 2
