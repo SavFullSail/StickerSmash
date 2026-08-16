@@ -18,7 +18,7 @@ export function AppHeader({
       <GlassTile size={64}>
         <Image systemName={icon} size={32} color="white" />
       </GlassTile>
-      <VStack spacing={4} alignment="leading">
+      <VStack spacing={6} alignment="leading">
         <Text modifiers={[font(typeScale.largeTitle), foregroundStyle('#FFFFFF')]}>{title}</Text>
         {subtitle && (
           <Text

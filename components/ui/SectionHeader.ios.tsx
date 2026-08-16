@@ -5,7 +5,7 @@ import type { SFSymbol } from 'sf-symbols-typescript';
 
 export function SectionHeader({ title, icon }: { title: string; icon?: SFSymbol }) {
   return (
-    <HStack spacing={8} alignment="center">
+    <HStack spacing={12} alignment="center">
       {icon && <Image systemName={icon} size={18} color={accent} />}
       <Text modifiers={[font(typeScale.title2), foregroundStyle('#FFFFFF')]}>{title}</Text>
       <Spacer />

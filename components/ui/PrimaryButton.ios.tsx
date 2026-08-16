@@ -19,7 +19,7 @@ export function PrimaryButton({
       modifiers={[
         buttonStyle('glassProminent'),
         font({ size: 16, weight: 'semibold' }),
-        padding({ horizontal: 24, vertical: 12 }),
+        padding({ horizontal: 28, vertical: 14 }),
       ]}
     />
   );
