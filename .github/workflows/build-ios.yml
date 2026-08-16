@@ -21,10 +21,22 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: npm
+
+      - name: 🥟 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: 🗂️ Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('**/bun.lock', '**/bun.lockb') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: 🗂️ Cache CocoaPods
         uses: actions/cache@v4
@@ -32,14 +44,14 @@ jobs:
           path: |
             ~/Library/Caches/CocoaPods
             ~/.cocoapods/repos
-          key: pods-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('**/bun.lock', '**/bun.lockb') }}
           restore-keys: |
             pods-${{ runner.os }}-
 
       - name: ⚙️ Prebuild Native iOS Project
         run: |
           rm -rf ios
-          npx expo prebuild --platform ios --clean
+          bunx expo prebuild --platform ios --clean
 
       - name: 🔨 Compile Unsigned ARM64 Device Binary
         run: |
