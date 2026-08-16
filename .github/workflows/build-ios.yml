@@ -3,6 +3,11 @@ name: Build Unsigned iOS IPA
 on:
   workflow_dispatch:
 
+# Auto-cancel stale builds immediately to save runner minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-15
@@ -10,39 +15,51 @@ jobs:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🛠️ Select Xcode 16.2
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      - name: 🛠️ Select Xcode 16.2 & Initialize Simulator Daemon
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.2.app
+          # Pre-warm CoreSimulator to prevent ibtool (SplashScreen storyboard) crash
+          xcrun simctl list devices > /dev/null 2>&1 || true
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js & Cache npm
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: 📦 Install Node Dependencies
-        run: npm install
+      - name: 📦 Install Dependencies (Fast)
+        run: npm ci || npm install
 
-      - name: ⚙️ Generate Native iOS Project & Install Pods
-        run: npx expo prebuild --platform ios --clean
-
-      - name: 🔨 Compile Unsigned ARM64 Device Binary
+      - name: ⚙️ Prebuild Native iOS Project
         run: |
-          xcodebuild \
+          rm -rf ios
+          npx expo prebuild --platform ios --clean
+
+      - name: 🔨 Compile & Archive Unsigned Device Binary (Optimized)
+        run: |
+          xcodebuild archive \
             -workspace ios/StickerSmash.xcworkspace \
             -scheme StickerSmash \
-            -sdk iphoneos \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
+            -archivePath build/StickerSmash.xcarchive \
+            -parallelizeTargets \
+            -jobs $(sysctl -n hw.ncpu) \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE_SPECIFIER=""
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
+            STRIP_INSTALLED_PRODUCT=YES
 
-      - name: 📦 Package into Sideloadable IPA
+      - name: 📦 Fast-Pack Sideloadable IPA
         run: |
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/*.app Payload/
-          zip -r StickerSmash.ipa Payload
+          cp -r build/StickerSmash.xcarchive/Products/Applications/*.app Payload/
+          # -1 uses fastest zip compression to cut build time & speed up AltStore install
+          zip -rq -1 StickerSmash.ipa Payload
           rm -rf Payload
 
       - name: ⬆️ Upload IPA Artifact
@@ -50,4 +67,4 @@ jobs:
         with:
           name: StickerSmash-Device-IPA
           path: StickerSmash.ipa
-          retention-days: 7
+          retention-days: 2
