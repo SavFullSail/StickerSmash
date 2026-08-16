@@ -3,7 +3,6 @@ name: Build Unsigned iOS IPA
 on:
   workflow_dispatch:
 
-# Auto-cancel stale builds immediately to save runner minutes
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,24 +17,22 @@ jobs:
       - name: 🛠️ Select Xcode 16.2 & Initialize Simulator Daemon
         run: |
           sudo xcode-select -s /Applications/Xcode_16.2.app
-          # Pre-warm CoreSimulator to prevent ibtool (SplashScreen storyboard) crash
           xcrun simctl list devices > /dev/null 2>&1 || true
 
-      - name: 🟢 Setup Node.js & Cache npm
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
-      - name: 📦 Install Dependencies (Fast)
-        run: npm ci || npm install
+      - name: 📦 Install Dependencies
+        run: npm install
 
       - name: ⚙️ Prebuild Native iOS Project
         run: |
           rm -rf ios
           npx expo prebuild --platform ios --clean
 
-      - name: 🔨 Compile & Archive Unsigned Device Binary (Optimized)
+      - name: 🔨 Compile & Archive Unsigned Device Binary
         run: |
           xcodebuild archive \
             -workspace ios/StickerSmash.xcworkspace \
@@ -58,7 +55,6 @@ jobs:
         run: |
           mkdir -p Payload
           cp -r build/StickerSmash.xcarchive/Products/Applications/*.app Payload/
-          # -1 uses fastest zip compression to cut build time & speed up AltStore install
           zip -rq -1 StickerSmash.ipa Payload
           rm -rf Payload
 
