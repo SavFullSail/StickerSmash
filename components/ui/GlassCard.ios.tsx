@@ -1,11 +1,13 @@
 import { VStack } from '@expo/ui/swift-ui';
-import { background, glassEffect, padding } from '@expo/ui/swift-ui/modifiers';
+import { background, glassEffect, padding, shapes } from '@expo/ui/swift-ui/modifiers';
 import { spacing as spacingTokens } from '@/components/theme';
+
+const CARD_RADIUS = 28;
 
 const glass = glassEffect({
   glass: { variant: 'regular', interactive: true },
   shape: 'roundedRectangle',
-  cornerRadius: 28,
+  cornerRadius: CARD_RADIUS,
 });
 
 export function GlassCard({
@@ -23,7 +25,7 @@ export function GlassCard({
       alignment="leading"
       modifiers={[
         glass,
-        background('#FFFFFF22'),
+        background('#FFFFFF22', shapes.roundedRectangle({ cornerRadius: CARD_RADIUS })),
         padding({ all: spacingTokens[paddingSize] }),
       ]}
     >
