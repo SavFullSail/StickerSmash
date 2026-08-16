@@ -17,9 +17,9 @@ export function PrimaryButton({
       systemImage={systemImage}
       onPress={onPress}
       modifiers={[
-        buttonStyle('glassProminent'),
         font({ size: 16, weight: 'semibold' }),
         padding({ horizontal: 28, vertical: 14 }),
+        buttonStyle('glassProminent'),
       ]}
     />
   );

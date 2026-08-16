@@ -24,9 +24,9 @@ export function GlassCard({
       spacing={gap}
       alignment="leading"
       modifiers={[
+        padding({ all: spacingTokens[paddingSize] }),
         glass,
         background('#FFFFFF22', shapes.roundedRectangle({ cornerRadius: CARD_RADIUS })),
-        padding({ all: spacingTokens[paddingSize] }),
       ]}
     >
       {children}

@@ -95,17 +95,17 @@ export default function HomeScreen() {
 
 function HStackTiles() {
   return (
-    <HStack spacing={16}>
-      <GlassTile size={64}>
+    <HStack spacing={12}>
+      <GlassTile size={60}>
         <Image systemName="heart.fill" size={24} color="#FF7AB8" />
       </GlassTile>
-      <GlassTile size={64}>
+      <GlassTile size={60}>
         <Image systemName="star.fill" size={24} color={accent} />
       </GlassTile>
-      <GlassTile size={64}>
+      <GlassTile size={60}>
         <Image systemName="bolt.fill" size={24} color="#38BDF8" />
       </GlassTile>
-      <GlassTile size={64}>
+      <GlassTile size={60}>
         <Image systemName="leaf.fill" size={24} color="#4ADE80" />
       </GlassTile>
     </HStack>

@@ -17,9 +17,9 @@ export function SecondaryButton({
       systemImage={systemImage}
       onPress={onPress}
       modifiers={[
-        buttonStyle('glass'),
         font({ size: 16, weight: 'semibold' }),
         padding({ horizontal: 28, vertical: 14 }),
+        buttonStyle('glass'),
       ]}
     />
   );
